@@ -1,0 +1,42 @@
+{
+  "name": "fuck-xf",
+  "version": "1.0.0",
+  "description": "Race provider wrapper: 8 parallel connections to an OpenAI-compatible endpoint, first valid SSE chunk wins, rest aborted. Failures signal opencode to retry immediately via retry-after-ms:0.",
+  "type": "module",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "prepack": "pnpm build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*": "eslint --fix"
+  },
+  "dependencies": {
+    "@ai-sdk/openai-compatible": "^3.0.13",
+    "@ai-sdk/provider": "^4.0.3",
+    "neverthrow": "^8.2.0"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^9.1.0",
+    "eslint": "^9.0.0",
+    "lint-staged": "^15.0.0",
+    "simple-git-hooks": "^2.11.0",
+    "tsdown": "^0.22.12",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}
