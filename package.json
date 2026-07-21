@@ -1,8 +1,22 @@
 {
-  "name": "fuck-xf",
+  "name": "@liyang8246/fxxk-xf",
   "version": "1.0.0",
   "description": "Race provider wrapper: 8 parallel connections to an OpenAI-compatible endpoint, first valid SSE chunk wins, rest aborted. Failures signal opencode to retry immediately via retry-after-ms:0.",
   "type": "module",
+  "packageManager": "pnpm@11.15.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liyang8246/fuck-xf.git"
+  },
+  "keywords": [
+    "opencode",
+    "ai-sdk",
+    "provider",
+    "race",
+    "openai-compatible",
+    "sse"
+  ],
   "types": "./dist/index.d.mts",
   "exports": {
     ".": "./dist/index.mjs",
@@ -19,12 +33,6 @@
     "test": "vitest",
     "typecheck": "tsc --noEmit"
   },
-  "simple-git-hooks": {
-    "pre-commit": "pnpm lint-staged"
-  },
-  "lint-staged": {
-    "*": "eslint --fix"
-  },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.13",
     "@ai-sdk/provider": "^4.0.3",
@@ -33,8 +41,6 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.1.0",
     "eslint": "^10.7.0",
-    "lint-staged": "^17.1.0",
-    "simple-git-hooks": "^2.13.1",
     "tsdown": "^0.22.12",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
