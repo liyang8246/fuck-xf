@@ -1,5 +1,5 @@
 allowBuilds:
-  esbuild: set this to true or false
-  simple-git-hooks: set this to true or false
+  esbuild: true
+  simple-git-hooks: true
 minimumReleaseAgeExclude:
   - '@ai-sdk/openai-compatible@3.0.13'
