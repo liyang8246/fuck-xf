@@ -1,5 +1,5 @@
 import { APICallError } from '@ai-sdk/provider'
-import { ALL_LANES_FAILED_MESSAGE, RETRY_AFTER_MS_ZERO } from './constants'
+import { ALL_LANES_FAILED_MESSAGE, RETRY_AFTER_MS } from './constants'
 
 export function toRetryableError(err: unknown): APICallError {
   const errors = unwrapAggregate(err)
@@ -13,7 +13,7 @@ export function toRetryableError(err: unknown): APICallError {
       statusCode: best.statusCode ?? 503,
       responseHeaders: {
         ...(best.responseHeaders ?? {}),
-        'retry-after-ms': RETRY_AFTER_MS_ZERO,
+        'retry-after-ms': RETRY_AFTER_MS,
       },
       responseBody: best.responseBody,
       isRetryable: true,
@@ -27,7 +27,7 @@ export function toRetryableError(err: unknown): APICallError {
     url: '',
     requestBodyValues: {},
     statusCode: 503,
-    responseHeaders: { 'retry-after-ms': RETRY_AFTER_MS_ZERO },
+    responseHeaders: { 'retry-after-ms': RETRY_AFTER_MS },
     responseBody: undefined,
     isRetryable: true,
     cause: err,
