@@ -1,4 +1,4 @@
-export const DEFAULT_CONCURRENCY = 8
+export const DEFAULT_CONCURRENCY = 4
 
 export const DEFAULT_BASE_URL = 'https://maas-coding-api.cn-huabei-1.xf-yun.com/v2'
 
