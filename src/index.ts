@@ -11,7 +11,7 @@ import {
   createOpenAICompatible,
 
 } from '@ai-sdk/openai-compatible'
-import { DEFAULT_BASE_URL, DEFAULT_CONCURRENCY } from './constants'
+import { DEFAULT_BASE_URL, DEFAULT_CONCURRENCY, RETRY_COOLDOWN_MS } from './constants'
 import { toRetryableError } from './error'
 import {
   abortLosers,
@@ -21,7 +21,7 @@ import {
   rejoinStream,
 
 } from './race'
-import { isAbortError } from './signal'
+import { isAbortError, sleep } from './signal'
 
 export type { RaceProvider, RaceProviderSettings } from './types'
 
@@ -54,6 +54,7 @@ export function createRaceProvider(settings: RaceProviderSettings): RaceProvider
             const e = result.error
             if (options.abortSignal?.aborted || isAbortError(e))
               throw e
+            await sleep(RETRY_COOLDOWN_MS, options.abortSignal)
             throw toRetryableError(e)
           }
           winnerLane = result.value.lane
@@ -73,6 +74,7 @@ export function createRaceProvider(settings: RaceProviderSettings): RaceProvider
             const e = result.error
             if (options.abortSignal?.aborted || isAbortError(e))
               throw e
+            await sleep(RETRY_COOLDOWN_MS, options.abortSignal)
             throw toRetryableError(e)
           }
           const winner: StreamWinner = result.value
