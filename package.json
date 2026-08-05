@@ -1,6 +1,6 @@
 {
   "name": "@liyang8246/fxxk-xf",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Race provider wrapper: 8 parallel connections to an OpenAI-compatible endpoint, first valid SSE chunk wins, rest aborted. Failures signal opencode to retry immediately via retry-after-ms:0.",
   "type": "module",
   "packageManager": "pnpm@11.15.0",

@@ -10,7 +10,7 @@ export function toRetryableError(err: unknown): APICallError {
       message: best.message,
       url: best.url,
       requestBodyValues: best.requestBodyValues,
-      statusCode: best.statusCode ?? 503,
+      statusCode: 429,
       responseHeaders: {
         ...(best.responseHeaders ?? {}),
         'retry-after-ms': RETRY_AFTER_MS,
@@ -26,7 +26,7 @@ export function toRetryableError(err: unknown): APICallError {
     message: errors.length > 0 ? errors.map(describe).join('; ') : ALL_LANES_FAILED_MESSAGE,
     url: '',
     requestBodyValues: {},
-    statusCode: 503,
+    statusCode: 429,
     responseHeaders: { 'retry-after-ms': RETRY_AFTER_MS },
     responseBody: undefined,
     isRetryable: true,
