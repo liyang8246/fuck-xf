@@ -1,11 +1,9 @@
 import type {
   LanguageModelV4CallOptions,
-  LanguageModelV4StreamPart,
-  LanguageModelV4StreamResult,
 } from '@ai-sdk/provider'
 import type { Result } from 'neverthrow'
 import type { Lane } from './types'
-import { err, ok } from 'neverthrow'
+import { ok } from 'neverthrow'
 import { aggregateError } from './error'
 import { mergeSignals } from './signal'
 
@@ -60,101 +58,5 @@ export function raceFirstResolve<T>(
             resolve(err(aggregateError(errors)))
         })
     }
-  })
-}
-
-export interface StreamWinner {
-  lane: Lane<LanguageModelV4StreamResult>
-  result: LanguageModelV4StreamResult
-  reader: ReadableStreamDefaultReader<LanguageModelV4StreamPart>
-  firstChunk: LanguageModelV4StreamPart
-}
-
-export function raceFirstValidChunk(
-  lanes: Lane<LanguageModelV4StreamResult>[],
-): Promise<Result<StreamWinner, unknown>> {
-  return new Promise((resolve) => {
-    let remaining = lanes.length
-    const errors: unknown[] = []
-    let settled = false
-
-    const failLane = (e: unknown): void => {
-      if (settled)
-        return
-      if (e !== undefined)
-        errors.push(e)
-      if (--remaining === 0)
-        resolve(err(aggregateError(errors)))
-    }
-
-    for (const lane of lanes) {
-      lane.promise
-        .then(async (result): Promise<void> => {
-          if (settled) {
-            lane.ac.abort()
-            return
-          }
-          if (!result.stream) {
-            failLane(undefined)
-            return
-          }
-          const reader = result.stream.getReader()
-          try {
-            const { value, done } = await reader.read()
-            if (done) {
-              failLane(undefined)
-              return
-            }
-            if (value && value.type !== 'error') {
-              settled = true
-              resolve(ok({ lane, result, reader, firstChunk: value }))
-              return
-            }
-            failLane(value)
-          }
-          catch (readErr) {
-            failLane(readErr)
-          }
-        })
-        .catch((e) => {
-          failLane(e)
-        })
-    }
-  })
-}
-
-export function rejoinStream(
-  reader: ReadableStreamDefaultReader<LanguageModelV4StreamPart>,
-  firstChunk: LanguageModelV4StreamPart,
-): ReadableStream<LanguageModelV4StreamPart> {
-  return new ReadableStream<LanguageModelV4StreamPart>({
-    start(controller) {
-      try {
-        controller.enqueue(firstChunk)
-      }
-      catch {
-      }
-      pump()
-      async function pump(): Promise<void> {
-        try {
-          while (true) {
-            const { value, done } = await reader.read()
-            if (done) {
-              controller.close()
-              return
-            }
-            if (value)
-              controller.enqueue(value)
-          }
-        }
-        catch (e) {
-          controller.enqueue({ type: 'error', error: e } as LanguageModelV4StreamPart)
-          controller.close()
-        }
-      }
-    },
-    cancel(reason) {
-      return reader.cancel(reason)
-    },
   })
 }

@@ -5,7 +5,6 @@ import type {
   LanguageModelV4GenerateResult,
   LanguageModelV4StreamResult,
 } from '@ai-sdk/provider'
-import type { StreamWinner } from './race'
 import type { Lane, RaceProvider, RaceProviderSettings } from './types'
 import {
   createOpenAICompatible,
@@ -17,8 +16,6 @@ import {
   abortLosers,
   buildLanes,
   raceFirstResolve,
-  raceFirstValidChunk,
-  rejoinStream,
 
 } from './race'
 import { isAbortError, sleep } from './signal'
@@ -36,8 +33,6 @@ export function createRaceProvider(settings: RaceProviderSettings): RaceProvider
 
   function raceLanguageModel(modelId: string): LanguageModelV4 {
     const model = underlying.languageModel(modelId)
-    if (n === 1)
-      return model
 
     const proxy: LanguageModelV4 = {
       specificationVersion: model.specificationVersion,
@@ -69,7 +64,7 @@ export function createRaceProvider(settings: RaceProviderSettings): RaceProvider
         const lanes = buildLanes(opts => model.doStream(opts), options, n)
         let winnerLane: Lane<LanguageModelV4StreamResult> | null = null
         try {
-          const result = await raceFirstValidChunk(lanes)
+          const result = await raceFirstResolve(lanes)
           if (result.isErr()) {
             const e = result.error
             if (options.abortSignal?.aborted || isAbortError(e))
@@ -77,13 +72,8 @@ export function createRaceProvider(settings: RaceProviderSettings): RaceProvider
             await sleep(RETRY_COOLDOWN_MS, options.abortSignal)
             throw toRetryableError(e)
           }
-          const winner: StreamWinner = result.value
-          winnerLane = winner.lane
-          return {
-            stream: rejoinStream(winner.reader, winner.firstChunk),
-            request: winner.result.request,
-            response: winner.result.response,
-          }
+          winnerLane = result.value.lane
+          return result.value.result
         }
         finally {
           abortLosers(lanes, winnerLane)
