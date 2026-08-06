@@ -1,6 +1,6 @@
 # fxxk-xf
 
-Race provider for [opencode](https://opencode.ai). Fires 8 parallel connections to an OpenAI-compatible endpoint, first successful HTTP 200 response wins, rest aborted. On total failure signals `retry-after-ms: 0` so opencode retries instantly.
+Race provider for [opencode](https://opencode.ai). Fires 8 parallel connections to an OpenAI-compatible endpoint, first valid SSE chunk wins, rest aborted. On total failure signals `retry-after-ms: 0` so opencode retries instantly.
 
 ## Use in opencode
 
